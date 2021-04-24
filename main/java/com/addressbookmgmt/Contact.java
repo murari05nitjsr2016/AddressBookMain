@@ -1,22 +1,19 @@
 package com.addressbookmgmt;
-
 import java.io.Serializable;
 import java.util.Scanner;
-
 public class Contact implements Serializable {
-    private String firstName;
-    private String lastName;
-    private String address;
-    private String city;
-    private String state;
-    private String zip;
-    private String mobNo;
-    private String email;
+    public String firstName;
+    public String lastName;
+    public String address;
+    public String city;
+    public String state;
+    public String zip;
+    public String mobNo;
+    public String email;
 
     public Contact() {
 
     }
-
 
     public Contact(String firstName, String lastName, String address, String city, String state, String zip,
                    String mobNo, String email) {
