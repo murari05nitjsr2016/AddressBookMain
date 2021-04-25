@@ -1,6 +1,14 @@
 package com.addressbookmgmt;
 
+import com.opencsv.CSVWriter;
+import com.opencsv.bean.StatefulBeanToCsv;
+import com.opencsv.bean.StatefulBeanToCsvBuilder;
+import com.opencsv.exceptions.CsvDataTypeMismatchException;
+import com.opencsv.exceptions.CsvRequiredFieldEmptyException;
+
 import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
@@ -10,6 +18,7 @@ public class AddressBookMain {
     static ArrayList<Contact> addressBook = new ArrayList<>();
     List<Contact> addressBook2;
     public enum IOService{CONSOLE_IO,FILE_IO,REST_IO}
+    private static String filePath = "C:\\Users\\MURARI\\IdeaProjects\\contact.csv";
 
     public AddressBookMain() {
 
@@ -152,7 +161,7 @@ using IO stream we acheive Data persistence.
         return false;
     }
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws CsvRequiredFieldEmptyException, IOException, CsvDataTypeMismatchException {
         addContact(new Contact("murari","kumar","mokama","patna","bihar","4566755","8709628464","murari05@gmail.com"));
         addContact(new Contact("neeraj","kumar","mokama","patna","bihar","4566755","8709628465","murari05@gmail.com"));
         addContact(new Contact("manish","kumar","mokama","patna","bihar","4566755","8709628464","murari05@gmail.com"));
@@ -167,6 +176,10 @@ using IO stream we acheive Data persistence.
         Scanner consoleInputReader = new Scanner(System.in);
         addressBookMain.readContactData(consoleInputReader);
         addressBookMain.writeContactData(IOService.CONSOLE_IO);
+        System.out.println("writing  contact object data to csv");
+        writeObjectToCsv(filePath);
+        System.out.println("reading  contact object data to csv");
+        readCsv(filePath);
     }
 
     public void writeContactData(AddressBookMain.IOService ioService) {
@@ -203,6 +216,58 @@ using IO stream we acheive Data persistence.
         if(ioService.equals(IOService.FILE_IO))
             return new AddressBookFileIOService().countEntries();
         return 0;
+
+    }
+
+    public static void writeObjectToCsv(String filepath) throws IOException, CsvDataTypeMismatchException, CsvRequiredFieldEmptyException {
+            try(Writer writer = Files.newBufferedWriter(Paths.get(filepath));)
+        {
+            StatefulBeanToCsv<Contact>  csv = new StatefulBeanToCsvBuilder<Contact>(writer).withQuotechar(CSVWriter.NO_QUOTE_CHARACTER).build();
+            List<Contact>  contact = new ArrayList<>();
+            contact.add(new Contact("murari","kumar","mokama","patna","bihar","4566755","8709628464","murari05@gmail.com"));
+            contact.add(new Contact("kumar","murari","mokama","patna","bihar","4566755","8709628464","murari05@gmail.com"));
+            csv.write(contact);
+        }
+
+    }
+
+    public static void readCsv(String filePath) {
+        BufferedReader reader = null;
+        try {
+            List<Contact> contact = new ArrayList<Contact>();
+            String line = "";
+            reader = new BufferedReader(new FileReader(filePath));
+            reader.readLine();
+            while (( reader.readLine() != null)) {
+                String[] field = line.split(",");
+                if (field.length > 0) {
+                    Contact contacts = new Contact();
+                    contacts.setFirstName("Murari");
+                    contacts.setLastName("Kumar");
+                    contacts.setAddress("Nauranga");
+                    contacts.setCity("Patna");
+                    contacts.setState("Bihar");
+                    contacts.setZip("811302");
+                    contacts.setMobNo("8709628464");
+                    contacts.setEmail("murari05nitjsr@gmail.com");
+                    contact.add(contacts);
+                }
+            }
+            for (Contact ad : contact) {
+                System.out.printf(
+                        "[First Name = %s,Last Name = s, Address = %s, City = %s, State = %s,Zip = %s,Phone Number = %s,Email = %s]\n",
+                        ad.getFirstName(), ad.getLastName(), ad.getAddress(), ad.getCity(), ad.getState(), ad.getZip(),
+                        ad.getMobNo(), ad.getEmail());
+            }
+        } catch (Exception e) {
+            e.fillInStackTrace();
+        } finally {
+            try {
+                reader.close();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
 
     }
 
